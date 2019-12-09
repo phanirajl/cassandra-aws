@@ -4,7 +4,7 @@
 
 variable "aws_key_name" {
   description = "AWS Key Name, to access EC2 instances through SSH"
-  default     = "agalue"                                            # For testing purposes only
+  default     = "agalue" # For testing purposes only
 }
 
 variable "aws_private_key" {
@@ -17,11 +17,12 @@ variable "aws_private_key" {
 
 variable "aws_region" {
   description = "EC2 Region for the VPC"
-  default     = "us-east-2"              # For testing purposes only
+  default     = "us-west-2" # For testing purposes only
 }
 
 data "aws_ami" "cassandra" {
   most_recent = true
+  owners      = ["self"]
 
   filter {
     name   = "name"
@@ -31,10 +32,11 @@ data "aws_ami" "cassandra" {
 
 data "aws_ami" "opennms" {
   most_recent = true
+  owners      = ["self"]
 
   filter {
     name   = "name"
-    values = ["horizon-*"]
+    values = ["horizon-pg10-cass-*"]
   }
 }
 
@@ -50,7 +52,7 @@ variable "public_subnet_cidr" {
 
 variable "cassandra_ip_addresses" {
   description = "Cassandra Servers Private IPs"
-  type        = "list"
+  type        = list(list(string))
 
   default = [
     ["172.17.1.21", "172.17.1.22", "172.17.1.23"],
@@ -62,7 +64,7 @@ variable "cassandra_ip_addresses" {
 
 variable "settings" {
   description = "Common application settings"
-  type        = "map"
+  type        = map(string)
 
   default = {
     cassandra_instance_type      = "m4.10xlarge"
@@ -78,5 +80,7 @@ variable "settings" {
     opennms_private_ip           = "172.17.1.100"
     opennms_cache_max_entries    = 4000000
     opennms_ring_buffer_size     = 4194304
+    opennms_cache_use_redis      = "false"
   }
 }
+
